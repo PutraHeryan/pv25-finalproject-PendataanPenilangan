@@ -10,7 +10,6 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import Qt, QDate
 
-# Informasi Mahasiswa (sesuaikan dengan data Anda)
 STUDENT_NAME = "Putra Heryan Gagah Perkasa"
 STUDENT_ID = "F1D022087"
 
@@ -29,23 +28,18 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Sistem Pendataan Pelaku Penilangan")
         self.setGeometry(100, 100, 900, 700)
 
-        # Membuat Menu Bar
         self.create_menu_bar()
 
-        # Membuat Status Bar
         self.create_status_bar()
 
-        # Widget utama dan layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
         main_layout = QVBoxLayout(central_widget)
 
-        # Form untuk input data
         form_layout = QGridLayout()
         form_layout.setSpacing(10)
 
-        # Input fields
         self.nama_input = QLineEdit()
         self.nama_input.setPlaceholderText("Masukkan nama lengkap pelanggar")
         
@@ -62,7 +56,6 @@ class MainWindow(QMainWindow):
         self.detail_input.setPlaceholderText("Contoh: Tidak memakai helm, melanggar lampu merah.")
         self.detail_input.setFixedHeight(80)
 
-        # Menambahkan widget ke form layout
         form_layout.addWidget(QLabel("Nama Pelanggar:"), 0, 0)
         form_layout.addWidget(self.nama_input, 0, 1)
         form_layout.addWidget(QLabel("Usia:"), 1, 0)
@@ -72,9 +65,8 @@ class MainWindow(QMainWindow):
         form_layout.addWidget(QLabel("Tanggal Kejadian:"), 3, 0)
         form_layout.addWidget(self.tanggal_input, 3, 1)
         form_layout.addWidget(QLabel("Detail Pelanggaran:"), 4, 0)
-        form_layout.addWidget(self.detail_input, 4, 1, 1, 2) # Span 2 kolom
+        form_layout.addWidget(self.detail_input, 4, 1, 1, 2)
         
-        # Tombol
         button_layout = QHBoxLayout()
         add_button = QPushButton("➕ Tambah Data")
         add_button.clicked.connect(self.add_data)
@@ -87,16 +79,14 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(export_button)
         button_layout.addStretch()
 
-        # Tabel untuk menampilkan data
         self.table_widget = QTableWidget()
         self.table_widget.setColumnCount(5)
         self.table_widget.setHorizontalHeaderLabels(["Nama", "Usia", "Gender", "Tanggal Kejadian", "Detail Pelanggaran"])
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.table_widget.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers) # Data tidak bisa diedit langsung di tabel
+        self.table_widget.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table_widget.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.table_widget.setObjectName("data_table") # Menambahkan nama objek untuk styling
+        self.table_widget.setObjectName("data_table")
 
-        # Menambahkan semua layout ke layout utama
         main_layout.addLayout(form_layout)
         main_layout.addLayout(button_layout)
         main_layout.addWidget(self.table_widget)
@@ -105,7 +95,6 @@ class MainWindow(QMainWindow):
         """Membuat dan mengkonfigurasi QMenuBar."""
         menu_bar = self.menuBar()
 
-        # Menu File
         file_menu = menu_bar.addMenu("File")
         export_action = QAction("Export ke CSV", self)
         export_action.triggered.connect(self.export_to_csv)
@@ -117,7 +106,6 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
-        # Menu Bantuan
         help_menu = menu_bar.addMenu("Bantuan")
         about_action = QAction("Tentang", self)
         about_action.triggered.connect(self.show_about_dialog)
@@ -160,7 +148,7 @@ class MainWindow(QMainWindow):
             cursor.execute("SELECT nama, usia, gender, tanggal, detail FROM pelanggaran")
             rows = cursor.fetchall()
             
-            self.table_widget.setRowCount(0) # Membersihkan tabel sebelum memuat data baru
+            self.table_widget.setRowCount(0)
             self.table_widget.setRowCount(len(rows))
             for row_idx, row_data in enumerate(rows):
                 for col_idx, col_data in enumerate(row_data):
@@ -194,7 +182,7 @@ class MainWindow(QMainWindow):
             conn.commit()
             self.statusBar().showMessage(f"Data '{nama}' berhasil ditambahkan!", 3000)
             self.clear_inputs()
-            self.load_data() # Refresh tabel
+            self.load_data()
         except sqlite3.Error as e:
             self.show_error_message("Database Error", f"Gagal menambahkan data: {e}")
         finally:
@@ -218,11 +206,9 @@ class MainWindow(QMainWindow):
                 with open(path, 'w', newline='', encoding='utf-8') as file:
                     writer = csv.writer(file)
                     
-                    # Tulis header
                     header = [self.table_widget.horizontalHeaderItem(i).text() for i in range(self.table_widget.columnCount())]
                     writer.writerow(header)
 
-                    # Tulis data
                     for row in range(self.table_widget.rowCount()):
                         row_data = [self.table_widget.item(row, col).text() for col in range(self.table_widget.columnCount())]
                         writer.writerow(row_data)
@@ -241,7 +227,6 @@ class MainWindow(QMainWindow):
 
     def show_error_message(self, title, message):
         """Menampilkan dialog pesan error."""
-        # Style untuk QMessageBox agar sesuai tema gelap
         msg_box = QMessageBox(self)
         msg_box.setStyleSheet("""
             QMessageBox {
@@ -343,7 +328,7 @@ def apply_stylesheet(app):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    apply_stylesheet(app) # Menerapkan style
+    apply_stylesheet(app)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
